@@ -3,6 +3,7 @@ from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
+from functools import wraps
 
 app = Flask(__name__)
 Articles = Articles()
@@ -62,6 +63,8 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
+
+# Signup
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegisterForm(request.form)
@@ -87,6 +90,66 @@ def signup():
 
         return redirect(url_for('signup'))
     return render_template('signup.html', form=form)
+
+# Sign in
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    if request.method == 'POST':
+        #Get form fields
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get user
+        result = cur.execute('SELECT * FROM users WHERE username = %s', [username])
+        if result > 0:
+            # Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+
+            # Compare Passwords
+            if sha256_crypt.verify(password_candidate, password):
+                # Passed
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                error = 'Invalid login'
+                return render_template('signin.html', error=error)
+            # Close connection
+            cur.close()
+        else:
+            error = 'Wrong password or username'
+            return render_template('signin.html', error=error)
+
+    return render_template('signin.html')
+
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please signin', 'danger')
+            return redirect(url_for('signin'))
+    return wrap
+
+# Dashboard
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+   return render_template('dashboard.html')
+# Signout
+@app.route('/signout')
+def signout():
+   session.clear()
+   flash('You are now signed out', 'success')
+   return redirect(url_for('signin'))
 
 if __name__ == '__main__':
     app.secret_key='secret123'

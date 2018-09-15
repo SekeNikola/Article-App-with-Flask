@@ -5,7 +5,11 @@
           <a class="p-2 text-dark" href="about">About</a>
           <a class="p-2 text-dark" href="articles">Articles</a>
         </nav>
-        <a class="p-2 text-dark" href="signup">Sign up</a>
+        {% if session.logged_in == true %}
         <a class="p-2 text-dark" href="dashboard">Dashboard</a>
         <a class="p-2 text-dark" href="signout">Sign Out</a>
+        {% else %}
+        <a class="p-2 text-dark" href="signup">Sign up</a>
+        <a class="p-2 text-dark" href="signin">Sign in</a>
+        {% endif %}
       </div>
