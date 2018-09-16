@@ -1,0 +1,29 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #f8f8f8;
+    font-family: "Oswald", "sans-serif";
+}
+
+h1{
+    font-size: 3rem
+}
+
+li{
+    font-size: 1.5rem
+}
+a{
+    color: #000;
+    text-decoration: none!important;
+}
+
+a:hover{
+    color: #b6b6b6
+}
+
+input[type="text"], .form-control{
+    border: none;
+    border-bottom:  1px solid lightblue;
+    background: #f8f8f8;
+}
