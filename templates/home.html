@@ -1,6 +1,25 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>Welcome to FlaskApp</h1>
-<p>You must sign in to add and edit articles</p>
+<div class="jumbotron text-white">
+  <h1>Welcome to FlaskApp</h1>
+  <p>You must sign in to add and edit articles</p>
+  {% if session.logged_in == NULL %}
+  <div class="action">
+    <a href="/signup" class="btn btn-primary btn-lg">Sign Up</a>
+    <a href="/signin" class="btn btn-success btn-lg">Sign In</a>
+    {% endif %}
+  </div>
+</div>
+<div class="container articles">
+
+  <h2 class="mb-3 mt-5">Latest Articles</h2>
+  <ul class="article-group pb-5">
+    {% for article in articles %}
+    <li class="article-home-title mb-2"><a href="article/{{article.id}}">{{article.title | safe}}</a></li>
+    <li class="article-home-body">{{article.body | safe}}</li>
+
+    {% endfor %}
+  </ul>
+</div>
 {% endblock %}
